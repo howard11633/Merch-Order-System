@@ -1,4 +1,4 @@
-package com.merchordersystem.backend.entity;
+package com.merchordersystem.backend.model;
 
 import jakarta.persistence.*;
 
