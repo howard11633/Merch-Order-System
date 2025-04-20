@@ -1,5 +1,7 @@
 package com.merchordersystem.backend.dao;
 
-public interface UserDao {
+import com.merchordersystem.backend.model.User;
 
+public interface UserDao {
+    User getById(Integer userId);
 }

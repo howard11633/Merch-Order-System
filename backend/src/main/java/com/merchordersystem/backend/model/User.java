@@ -14,17 +14,17 @@ public class User {
     @Column(name ="name")
     private String name;
 
-    @Column(name ="gender")
-    private String gender;
-
-    @Column(name ="email")
-    private String email;
-
-    @Column(name ="role")
-    private String role;
-
-    @Column(name ="password")
-    private String password;
+//    @Column(name ="gender")
+//    private String gender;
+//
+//    @Column(name ="email")
+//    private String email;
+//
+//    @Column(name ="role")
+//    private String role;
+//
+//    @Column(name ="password")
+//    private String password;
 
     public Integer getId() {
         return id;
