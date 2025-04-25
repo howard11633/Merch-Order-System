@@ -1,9 +1,15 @@
 package com.merchordersystem.backend.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user")
+@Getter
+@Setter
 public class User {
 
     @Id //PRIMARY KEY
@@ -14,31 +20,25 @@ public class User {
     @Column(name ="name")
     private String name;
 
-//    @Column(name ="gender")
-//    private String gender;
-//
-//    @Column(name ="email")
-//    private String email;
-//
-//    @Column(name ="role")
-//    private String role;
-//
-//    @Column(name ="password")
-//    private String password;
+    @Enumerated(EnumType.STRING)
+    @Column(name ="gender")
+    private Gender gender;
 
-    public Integer getId() {
-        return id;
-    }
+    @Column(name ="email")
+    private String email;
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(name ="role")
+    private Role role;
 
-    public String getName() {
-        return name;
-    }
+    @Column(name ="password")
+    private String password;
 
-    public void setName(String name) {
-        this.name = name;
+    @Column(name ="created_at")
+    private LocalDateTime created_at;
+
+    @PrePersist
+    protected void onCreate() {
+        this.created_at = LocalDateTime.now();
     }
 }

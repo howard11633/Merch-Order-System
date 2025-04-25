@@ -17,6 +17,40 @@ public class UserDaoImpl implements UserDao {
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    //增
+//    public String insert (User user){
+//        String sql = "INSERT INTO user (:name)";
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("userId", userId);
+//        List<User> list = namedParameterJdbcTemplate.query(sql, map, new UserRowMapper());
+//
+//        return "刪除";
+//    }
+
+    //增多
+//    public String insertByList (User user){
+//        String sql = "INSERT INTO user (:name)";
+//
+//        Map<String, Object> map = new HashMap<>();
+//        map.put("userId", userId);
+//        List<User> list = namedParameterJdbcTemplate.query(sql, map, new UserRowMapper());
+//
+//        return "刪除";
+//    }
+
+    //刪
+    public String deleteById (Integer userId){
+        String sql = "DELETE id, name FROM user WHERE id = :userId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+        List<User> list = namedParameterJdbcTemplate.query(sql, map, new UserRowMapper());
+
+        return "刪除";
+    }
+
+    //查
     public User getById(Integer userId){
         String sql = "SELECT id, name FROM user WHERE id = :userId";
 
