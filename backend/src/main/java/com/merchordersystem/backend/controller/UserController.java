@@ -1,59 +1,56 @@
 package com.merchordersystem.backend.controller;
 
-import com.merchordersystem.backend.repository.UserRepository;
+import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.service.UserService;
-import jakarta.validation.constraints.Null;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 
+//1.0 使用者模組
 @RestController
 public class UserController {
 
     @Autowired
     private UserService userService;
 
+    //新增使用者
     @PostMapping("/users")
-    public String insert(@RequestBody User user){
-        userService.createUser(user);
-        return "執行Create";
+    public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest){
+
+        Integer userId = userService.createUser(userRequest);
+        User user = userService.getById(userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @DeleteMapping("/users/{userId}")
-    public String delete(@PathVariable Integer userId){
-        userService.deleteById(userId);
-        return "執行Delete";
-    }
-
+    //修改使用者資料
     @PutMapping("/users/{userId}")
-    public String update(@PathVariable Integer userId,
-                         @RequestBody User user){
+    public ResponseEntity<User> updateUser(@PathVariable Integer userId,
+                                           @RequestBody @Valid UserRequest userRequest){
+        User user = getUser(userId);
 
-        User u = get(userId);
-
-        if (u != null) {
-
-            u.setName(user.getName());
-            u.setPassword(user.getPassword());
-            u.setGender(user.getGender());
-
-            userService.updateUser(u);
-
-            return "執行Update";
+        if (user != null) {
+            userService.updateUser(userId, userRequest);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
         }
         else {
-            return "執行Update失敗，找不到該id資料";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
 
-
-
-
+    //刪除使用者
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Integer userId){
+        userService.deleteUser(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/users/{userId}")
-    public User get(@PathVariable Integer userId){
+    public User getUser(@PathVariable Integer userId){
         return userService.getById(userId);
     }
 

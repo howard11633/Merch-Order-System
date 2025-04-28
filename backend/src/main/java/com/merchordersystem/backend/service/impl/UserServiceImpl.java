@@ -1,12 +1,15 @@
 package com.merchordersystem.backend.service.impl;
 
 import com.merchordersystem.backend.dao.UserDao;
+import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -20,20 +23,38 @@ public class UserServiceImpl implements UserService {
 
     //增
     @Override
-    public void createUser(User user) {
+    public Integer createUser(UserRequest userRequest) {
+        User user = new User();
+        user.setName(userRequest.getName());
+        user.setEmail(userRequest.getEmail());
+        user.setPassword(userRequest.getPassword());
+        user.setGender(userRequest.getGender());
+        user.setRole(userRequest.getRole());
+        // 存進 DB
         userRepository.save(user);
+
+        // 回傳主鍵 ID（或你要回傳 DTO 都可）
+        return user.getId();
     }
 
     //刪
     @Override
-    public void deleteById(Integer userId) {
+    public void deleteUser(Integer userId) {
         userRepository.deleteById(userId);
     }
 
     //改
     @Override
-    public void updateUser(User user) {
-        userRepository.save(user);
+    public void updateUser(Integer userId, UserRequest userRequest) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            user.setName(userRequest.getName());
+            user.setEmail(userRequest.getEmail());
+            user.setGender(userRequest.getGender());
+            user.setRole(userRequest.getRole());
+            user.setPassword(userRequest.getPassword());
+            userRepository.save(user);
+        }
     }
 
     //查
