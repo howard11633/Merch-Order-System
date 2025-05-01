@@ -1,6 +1,7 @@
 package com.merchordersystem.backend.service;
 
 import com.merchordersystem.backend.dto.UserRequest;
+import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import org.springframework.http.ResponseEntity;
 
@@ -15,4 +16,6 @@ public interface UserService {
     void deleteUser(Integer userId);
 
     List<User> getUsers();
+    List<User> getUsersByRole(Role role);
+
 }
