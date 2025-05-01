@@ -6,11 +6,9 @@ import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Component
 public class UserServiceImpl implements UserService {
@@ -61,5 +59,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Integer userId) {
         return userRepository.findById(userId).orElse(null);//沒有.orElse會出錯
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 }

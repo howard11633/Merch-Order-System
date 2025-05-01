@@ -1,6 +1,7 @@
 package com.merchordersystem.backend.controller;
 
 import com.merchordersystem.backend.dto.UserRequest;
+import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 //1.0 使用者模組
@@ -49,10 +52,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    //查詢單一使用者
     @GetMapping("/users/{userId}")
     public User getUser(@PathVariable Integer userId){
         return userService.getById(userId);
     }
 
+    //查詢所有使用者
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getUsers(){
+        List<User> userList = userService.getUsers();
+        return ResponseEntity.status(HttpStatus.OK).body(userList);//無論有無查到，都回傳OK
+    }
 
 }
