@@ -15,7 +15,5 @@ public interface UserService {
     void updateUser(Integer userId, UserRequest userRequest);
     void deleteUser(Integer userId);
 
-    List<User> getUsers();
-    List<User> getUsersByRole(Role role);
-
+    List<User> getUsers(Role role, String search);
 }

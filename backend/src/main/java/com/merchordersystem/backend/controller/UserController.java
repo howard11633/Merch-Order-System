@@ -62,16 +62,10 @@ public class UserController {
     //查詢所有使用者
     @GetMapping("/users")
     public ResponseEntity<List<User>> getUsers(
-            @RequestParam(required = false) Role role //以此決定要查哪種類型的使用者(ADMIN or MEMBER)
+            @RequestParam(required = false) Role role, //以此決定要查哪種類型的使用者(ADMIN or MEMBER)
+            @RequestParam(required = false) String search
     ){
-        List<User> userList;
-
-        if (role != null){
-            userList = userService.getUsersByRole(role);
-        }
-        else {
-            userList = userService.getUsers();
-        }
+        List<User> userList = userService.getUsers(role, search);
         return ResponseEntity.status(HttpStatus.OK).body(userList);//無論有無查到，都回傳OK
     }
 

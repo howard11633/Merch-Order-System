@@ -7,6 +7,8 @@ import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -63,12 +65,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<User> getUsers(Role role, String search) {
+        // 如果完全沒參數 → 全部使用者
+        if (role == null && (search == null || search.isEmpty())) {
+            return userRepository.findAll();
+        }
+
+        // 有參數時 → 用複合查詢
+        return userRepository.findByDynamicConditions(role, search);
     }
 
-    @Override
-    public List<User> getUsersByRole(Role role) {
-        return userRepository.findByRole(role);
-    }
+
 }
