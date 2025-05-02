@@ -1,12 +1,9 @@
 package com.merchordersystem.backend.service;
-
+import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
-import org.springframework.http.ResponseEntity;
-
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
     //CRUD
@@ -15,5 +12,5 @@ public interface UserService {
     void updateUser(Integer userId, UserRequest userRequest);
     void deleteUser(Integer userId);
 
-    List<User> getUsers(Role role, String search);
+    List<User> getUsers(UserQueryParams userQueryParams);
 }

@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.controller;
 
+import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.model.Role;
@@ -61,11 +62,8 @@ public class UserController {
 
     //查詢所有使用者
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers(
-            @RequestParam(required = false) Role role, //以此決定要查哪種類型的使用者(ADMIN or MEMBER)
-            @RequestParam(required = false) String search
-    ){
-        List<User> userList = userService.getUsers(role, search);
+    public ResponseEntity<List<User>> getUsers(UserQueryParams userQueryParams){
+        List<User> userList = userService.getUsers(userQueryParams);
         return ResponseEntity.status(HttpStatus.OK).body(userList);//無論有無查到，都回傳OK
     }
 

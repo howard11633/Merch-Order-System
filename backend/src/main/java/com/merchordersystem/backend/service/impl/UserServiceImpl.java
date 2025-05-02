@@ -1,14 +1,13 @@
 package com.merchordersystem.backend.service.impl;
 
 import com.merchordersystem.backend.dao.UserDao;
+import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -65,7 +64,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsers(Role role, String search) {
+    public List<User> getUsers(UserQueryParams userQueryParams) {
+        Role role = userQueryParams.getRole();
+        String search = userQueryParams.getSearch();
         // 如果完全沒參數 → 全部使用者
         if (role == null && (search == null || search.isEmpty())) {
             return userRepository.findAll();
