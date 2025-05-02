@@ -62,7 +62,21 @@ public class UserController {
 
     //查詢所有使用者
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers(UserQueryParams userQueryParams){
+    public ResponseEntity<List<User>> getUsers(
+            //查詢條件 Filtering
+            @RequestParam(required = false) Role role,
+            @RequestParam(required = false) String search,
+            //排序 Sorting
+            @RequestParam(defaultValue = "created_at") String orderBy,
+            @RequestParam(defaultValue = "desc") String sort
+            ){
+
+        UserQueryParams userQueryParams = new UserQueryParams();
+        userQueryParams.setRole(role);
+        userQueryParams.setSearch(search);
+        userQueryParams.setOrderBy(orderBy);
+        userQueryParams.setSort(sort);
+
         List<User> userList = userService.getUsers(userQueryParams);
         return ResponseEntity.status(HttpStatus.OK).body(userList);//無論有無查到，都回傳OK
     }

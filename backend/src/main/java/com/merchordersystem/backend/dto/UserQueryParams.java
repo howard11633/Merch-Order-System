@@ -9,4 +9,6 @@ import lombok.Setter;
 public class UserQueryParams {
     private Role role;
     private String search;
+    private String orderBy;
+    private String sort;
 }
