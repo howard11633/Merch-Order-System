@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserService {
     //一般使用者註冊
     Integer register(UserRegisterRequest userRegisterRequest);
-
+    User getByEmail(String email);
     //CRUD
     User getById(Integer userId);
     Integer createUser(UserRequest userRequest);

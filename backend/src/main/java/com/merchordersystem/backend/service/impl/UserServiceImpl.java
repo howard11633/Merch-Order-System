@@ -9,18 +9,26 @@ import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Component
 public class UserServiceImpl implements UserService {
+
+    //加入log機制：slf4j logger
+    private final static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserDao userDao;
@@ -30,16 +38,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer register(UserRegisterRequest userRegisterRequest) {
+
+        //先用email取得User
+        User checkUser = userRepository.getByEmail(userRegisterRequest.getEmail());
+
+        if (checkUser != null){
+            log.warn("該email {} 已被註冊", userRegisterRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        //email沒被用過，可以建立新User
         User user = new User();
         user.setName(userRegisterRequest.getName());
         user.setEmail(userRegisterRequest.getEmail());
         user.setPassword(userRegisterRequest.getPassword());
         user.setGender(userRegisterRequest.getGender());
         user.setRole(Role.MEMBER);
+
         // 存進 DB
         userRepository.save(user);
 
         return user.getId();
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        return userRepository.getByEmail(email);
     }
 
     //增
