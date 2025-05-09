@@ -12,5 +12,9 @@ public interface UserService {
     void updateUser(Integer userId, UserRequest userRequest);
     void deleteUser(Integer userId);
 
+    //動態查詢使用者用
     List<User> getUsers(UserQueryParams userQueryParams);
+
+    //用數量算出分頁頁碼總數
+    Long countUser(UserQueryParams userQueryParams);
 }

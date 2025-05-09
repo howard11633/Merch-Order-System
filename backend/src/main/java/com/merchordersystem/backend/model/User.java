@@ -35,10 +35,10 @@ public class User {
     private String password;
 
     @Column(name ="created_at")
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @PrePersist
     protected void onCreate() {
-        this.created_at = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now();
     }
 }

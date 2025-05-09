@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.service.impl;
 
+import com.merchordersystem.backend.Specification.UserSpecification;
 import com.merchordersystem.backend.dao.UserDao;
 import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRequest;
@@ -8,6 +9,11 @@ import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
 import com.merchordersystem.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -65,16 +71,33 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsers(UserQueryParams userQueryParams) {
-        Role role = userQueryParams.getRole();
-        String search = userQueryParams.getSearch();
-        // 如果完全沒參數 → 全部使用者
-        if (role == null && (search == null || search.isEmpty())) {
-            return userRepository.findAll();
-        }
+        // role跟search沒在這用到
+//        Role role = userQueryParams.getRole();
+//        String search = userQueryParams.getSearch();
 
-        // 有參數時 → 用複合查詢
-        return userRepository.findByDynamicConditions(role, search);
+
+//        String orderBy = userQueryParams.getOrderBy();
+//        String sort = userQueryParams.getSort();
+//        Integer limit = userQueryParams.getLimit();
+//        Integer offset = userQueryParams.getOffset();
+
+        String orderBy = userQueryParams.getOrderBy() != null ? userQueryParams.getOrderBy() : "created_at";
+        String sort = userQueryParams.getSort() != null ? userQueryParams.getSort() : "desc";
+        int limit = (userQueryParams.getLimit() != null && userQueryParams.getLimit() > 0) ? userQueryParams.getLimit() : 8;
+        int offset = (userQueryParams.getOffset() != null && userQueryParams.getOffset() >= 0) ? userQueryParams.getOffset() : 0;
+
+        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(direction, orderBy));
+        Specification<User> spec = UserSpecification.build(userQueryParams); // Filtering
+        Page<User> springPage = userRepository.findAll(spec, pageable);
+
+//        // 如果完全沒參數 → 全部使用者
+        return springPage.getContent();
     }
 
-
+    @Override
+    public Long countUser(UserQueryParams userQueryParams) {
+        Specification<User> spec = UserSpecification.build(userQueryParams); // Filtering
+        return userRepository.count(spec);
+    }
 }

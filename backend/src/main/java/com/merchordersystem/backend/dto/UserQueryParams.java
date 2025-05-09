@@ -11,4 +11,6 @@ public class UserQueryParams {
     private String search;
     private String orderBy;
     private String sort;
+    private Integer limit;
+    private Integer offset;
 }

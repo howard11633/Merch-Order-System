@@ -6,6 +6,7 @@ import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.service.UserService;
+import com.merchordersystem.backend.util.Page;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    //新增使用者
+    //（後台）新增使用者
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody @Valid UserRequest userRequest){
 
@@ -60,15 +61,18 @@ public class UserController {
         return userService.getById(userId);
     }
 
-    //查詢所有使用者
+    //動態查詢使用者
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers(
+    public ResponseEntity<Page<User>> getUsers(
             //查詢條件 Filtering
             @RequestParam(required = false) Role role,
             @RequestParam(required = false) String search,
             //排序 Sorting
-            @RequestParam(defaultValue = "created_at") String orderBy,
-            @RequestParam(defaultValue = "desc") String sort
+            @RequestParam(defaultValue = "name") String orderBy,
+            @RequestParam(defaultValue = "desc") String sort,
+            //排序 Sorting
+            @RequestParam(defaultValue = "8") Integer limit, //前幾筆資料
+            @RequestParam(defaultValue = "0") Integer offset //跳過幾筆資料
             ){
 
         UserQueryParams userQueryParams = new UserQueryParams();
@@ -76,9 +80,21 @@ public class UserController {
         userQueryParams.setSearch(search);
         userQueryParams.setOrderBy(orderBy);
         userQueryParams.setSort(sort);
+        userQueryParams.setLimit(limit);
+        userQueryParams.setOffset(offset);
 
         List<User> userList = userService.getUsers(userQueryParams);
-        return ResponseEntity.status(HttpStatus.OK).body(userList);//無論有無查到，都回傳OK
+
+        Long total = userService.countUser(userQueryParams);
+
+        //以頁面形式回傳
+        Page<User> page = new Page<>();
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(userList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);//無論有無查到，都回傳OK
     }
 
 }
