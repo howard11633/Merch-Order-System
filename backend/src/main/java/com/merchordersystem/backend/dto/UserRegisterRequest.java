@@ -1,6 +1,8 @@
 package com.merchordersystem.backend.dto;
 
 import com.merchordersystem.backend.model.Gender;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +16,11 @@ public class UserRegisterRequest {
     @NotNull
     private Gender gender;
 
-    @NotNull
+    @NotBlank //避免null和空字串
+    @Email //確保email格式
     private String email;
 
-    @NotNull
+
+    @NotBlank
     private String password;
 }

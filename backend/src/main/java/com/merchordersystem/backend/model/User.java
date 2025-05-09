@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class User {
     @Column(name ="gender")
     private Gender gender;
 
+    //
     @Column(name ="email")
     private String email;
 
@@ -31,6 +33,7 @@ public class User {
     @Column(name ="role")
     private Role role;
 
+    @JsonIgnore
     @Column(name ="password")
     private String password;
 
