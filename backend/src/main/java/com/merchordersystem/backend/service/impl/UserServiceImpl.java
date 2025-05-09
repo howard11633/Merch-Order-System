@@ -3,6 +3,7 @@ package com.merchordersystem.backend.service.impl;
 import com.merchordersystem.backend.Specification.UserSpecification;
 import com.merchordersystem.backend.dao.UserDao;
 import com.merchordersystem.backend.dto.UserQueryParams;
+import com.merchordersystem.backend.dto.UserRegisterRequest;
 import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
@@ -26,6 +27,20 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Override
+    public Integer register(UserRegisterRequest userRegisterRequest) {
+        User user = new User();
+        user.setName(userRegisterRequest.getName());
+        user.setEmail(userRegisterRequest.getEmail());
+        user.setPassword(userRegisterRequest.getPassword());
+        user.setGender(userRegisterRequest.getGender());
+        user.setRole(Role.MEMBER);
+        // 存進 DB
+        userRepository.save(user);
+
+        return user.getId();
+    }
 
     //增
     @Override

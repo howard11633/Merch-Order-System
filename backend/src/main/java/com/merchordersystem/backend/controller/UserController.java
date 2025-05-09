@@ -1,6 +1,7 @@
 package com.merchordersystem.backend.controller;
 
 import com.merchordersystem.backend.dto.UserQueryParams;
+import com.merchordersystem.backend.dto.UserRegisterRequest;
 import com.merchordersystem.backend.dto.UserRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.model.Role;
@@ -22,6 +23,16 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    // 一般使用者註冊
+    @PostMapping("/users/register")
+    public ResponseEntity<User> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest){
+
+        Integer userId = userService.register(userRegisterRequest);
+        User user = userService.getById(userId);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
 
     //（後台）新增使用者
     @PostMapping("/users")
@@ -70,7 +81,7 @@ public class UserController {
             //排序 Sorting
             @RequestParam(defaultValue = "name") String orderBy,
             @RequestParam(defaultValue = "desc") String sort,
-            //排序 Sorting
+            //分頁 Pagination
             @RequestParam(defaultValue = "8") Integer limit, //前幾筆資料
             @RequestParam(defaultValue = "0") Integer offset //跳過幾筆資料
             ){
