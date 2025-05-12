@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -48,11 +49,15 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
+        //生成雜湊值
+        String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+        userRegisterRequest.setPassword(hashedPassword);
+
         //email沒被用過，可以建立新User
         User user = new User();
         user.setName(userRegisterRequest.getName());
         user.setEmail(userRegisterRequest.getEmail());
-        user.setPassword(userRegisterRequest.getPassword());
+        user.setPassword(hashedPassword);
         user.setGender(userRegisterRequest.getGender());
         user.setRole(Role.MEMBER);
 
@@ -78,8 +83,12 @@ public class UserServiceImpl implements UserService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        //密碼正確
-        if (userLoginRequest.getPassword().equals(user.getPassword())){
+        //使用MD5生成密碼雜湊值
+        String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+
+
+        //判斷密碼是否正確
+        if (hashedPassword.equals(user.getPassword())){
             return user;
 
         } else {
