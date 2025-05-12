@@ -2,6 +2,7 @@ package com.merchordersystem.backend.service.impl;
 
 import com.merchordersystem.backend.Specification.UserSpecification;
 import com.merchordersystem.backend.dao.UserDao;
+import com.merchordersystem.backend.dto.UserLoginRequest;
 import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRegisterRequest;
 import com.merchordersystem.backend.dto.UserRequest;
@@ -64,6 +65,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByEmail(String email) {
         return userRepository.getByEmail(email);
+    }
+
+    //登入
+    @Override
+    public User login(UserLoginRequest userLoginRequest) {
+        User user = getByEmail(userLoginRequest.getEmail());
+
+        //若尚未註冊
+        if (user == null){
+            log.warn("該email {} 尚未註冊", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        //密碼正確
+        if (userLoginRequest.getPassword().equals(user.getPassword())){
+            return user;
+
+        } else {
+            log.warn("該email {} 密碼不正確", userLoginRequest.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     //增

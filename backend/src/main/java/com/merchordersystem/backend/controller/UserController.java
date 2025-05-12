@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.controller;
 
+import com.merchordersystem.backend.dto.UserLoginRequest;
 import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRegisterRequest;
 import com.merchordersystem.backend.dto.UserRequest;
@@ -24,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // 一般使用者註冊
+    // (一般使用者)註冊
     @PostMapping("/users/register")
     public ResponseEntity<User> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest){
 
@@ -32,6 +33,15 @@ public class UserController {
         User user = userService.getById(userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    //登入 (要用RequestBody傳資料)
+    @PostMapping("/users/login")
+    public ResponseEntity<User> login (@RequestBody @Valid UserLoginRequest userLoginRequest){
+        //用User object接
+        User user = userService.login(userLoginRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     //（後台）新增使用者

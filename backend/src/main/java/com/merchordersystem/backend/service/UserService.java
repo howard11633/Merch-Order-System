@@ -1,4 +1,5 @@
 package com.merchordersystem.backend.service;
+import com.merchordersystem.backend.dto.UserLoginRequest;
 import com.merchordersystem.backend.dto.UserQueryParams;
 import com.merchordersystem.backend.dto.UserRegisterRequest;
 import com.merchordersystem.backend.dto.UserRequest;
@@ -10,6 +11,7 @@ public interface UserService {
     //一般使用者註冊
     Integer register(UserRegisterRequest userRegisterRequest);
     User getByEmail(String email);
+    User login(UserLoginRequest userLoginRequest);
     //CRUD
     User getById(Integer userId);
     Integer createUser(UserRequest userRequest);
