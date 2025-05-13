@@ -1,41 +1,54 @@
 package com.merchordersystem.backend.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "products")
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Integer id;
 
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "price")
     private double price;
+
+    @Column(name = "number")
     private double number;
 
-    public Product() {}
+    @Column(name = "description")
+    private String description;
 
-    public Product(String name, double price, double number) {
-        this.name = name;
-        this.price = price;
-        this.number = number;
+    @Column(name ="created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "last_modified_time")
+    private LocalDateTime lastModifiedTime;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.lastModifiedTime = now;
     }
 
-    // Getters and Setters
-    public double getNumber() {
-        return number;
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastModifiedTime = LocalDateTime.now();
     }
 
-    public void setNumber(double number) {
-        this.number = number;
-    }
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
 }

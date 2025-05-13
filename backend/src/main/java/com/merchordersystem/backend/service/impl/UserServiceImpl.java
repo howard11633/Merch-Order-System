@@ -2,10 +2,10 @@ package com.merchordersystem.backend.service.impl;
 
 import com.merchordersystem.backend.Specification.UserSpecification;
 import com.merchordersystem.backend.dao.UserDao;
-import com.merchordersystem.backend.dto.UserLoginRequest;
-import com.merchordersystem.backend.dto.UserQueryParams;
-import com.merchordersystem.backend.dto.UserRegisterRequest;
-import com.merchordersystem.backend.dto.UserRequest;
+import com.merchordersystem.backend.dto.user.UserLoginRequest;
+import com.merchordersystem.backend.dto.user.UserQueryParams;
+import com.merchordersystem.backend.dto.user.UserRegisterRequest;
+import com.merchordersystem.backend.dto.user.UserRequest;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.repository.UserRepository;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -67,6 +66,7 @@ public class UserServiceImpl implements UserService {
         return user.getId();
     }
 
+    //登入時，透過email抓取使用者資料後，再去比對密碼
     @Override
     public User getByEmail(String email) {
         return userRepository.getByEmail(email);

@@ -1,6 +1,6 @@
 package com.merchordersystem.backend.Specification;
 
-import com.merchordersystem.backend.dto.UserQueryParams;
+import com.merchordersystem.backend.dto.user.UserQueryParams;
 import com.merchordersystem.backend.model.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;

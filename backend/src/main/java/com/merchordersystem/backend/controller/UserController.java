@@ -1,10 +1,9 @@
 package com.merchordersystem.backend.controller;
 
-import com.merchordersystem.backend.dto.UserLoginRequest;
-import com.merchordersystem.backend.dto.UserQueryParams;
-import com.merchordersystem.backend.dto.UserRegisterRequest;
-import com.merchordersystem.backend.dto.UserRequest;
-import com.merchordersystem.backend.model.Product;
+import com.merchordersystem.backend.dto.user.UserLoginRequest;
+import com.merchordersystem.backend.dto.user.UserQueryParams;
+import com.merchordersystem.backend.dto.user.UserRegisterRequest;
+import com.merchordersystem.backend.dto.user.UserRequest;
 import com.merchordersystem.backend.model.Role;
 import com.merchordersystem.backend.model.User;
 import com.merchordersystem.backend.service.UserService;

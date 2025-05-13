@@ -1,4 +1,4 @@
-package com.merchordersystem.backend.dto;
+package com.merchordersystem.backend.dto.user;
 
 import com.merchordersystem.backend.model.Role;
 import lombok.Getter;

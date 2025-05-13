@@ -1,29 +1,26 @@
-package com.merchordersystem.backend.dto;
+package com.merchordersystem.backend.dto.user;
 
 import com.merchordersystem.backend.model.Gender;
-import com.merchordersystem.backend.model.Role;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class UserRequest {
-
+public class UserRegisterRequest {
     @NotNull
     private String name;
 
     @NotNull
     private Gender gender;
 
-    @NotNull
+    @NotBlank //避免null和空字串
+    @Email //確保email格式
     private String email;
 
-    @NotNull
-    private Role role;
 
-    @NotNull
+    @NotBlank
     private String password;
-
 }

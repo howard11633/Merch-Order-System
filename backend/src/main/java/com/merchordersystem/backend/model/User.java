@@ -2,7 +2,9 @@ package com.merchordersystem.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,6 +13,8 @@ import java.time.LocalDateTime;
 @Table(name = "user")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id //PRIMARY KEY
@@ -25,7 +29,6 @@ public class User {
     @Column(name ="gender")
     private Gender gender;
 
-    //
     @Column(name ="email")
     private String email;
 
