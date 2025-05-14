@@ -25,10 +25,10 @@ public class Product {
     private String name;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "number")
-    private double number;
+    private Double number;
 
     @Column(name = "description")
     private String description;

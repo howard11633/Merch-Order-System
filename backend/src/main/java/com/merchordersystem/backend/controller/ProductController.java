@@ -1,13 +1,18 @@
 package com.merchordersystem.backend.controller;
 
+import com.merchordersystem.backend.dto.product.ProductQueryParams;
 import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.service.ProductService;
+import com.merchordersystem.backend.util.Page;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class ProductController {
@@ -50,6 +55,38 @@ public class ProductController {
     @GetMapping("/products/{productId}")
     public Product getProduct(@PathVariable Integer productId){
         return productService.getProductById(productId);
+    }
+
+    //查詢多個使用者
+    @GetMapping("/products")
+    public ResponseEntity<Page<Product>> getProducts(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Double price,
+            @RequestParam(defaultValue = "price") String orderBy,
+            @RequestParam(defaultValue = "asc") String sort,
+            @RequestParam(defaultValue = "4") Integer limit,
+            @RequestParam(defaultValue = "0") Integer offset){
+
+        ProductQueryParams productQueryParams = new ProductQueryParams();
+        productQueryParams.setSearch(search);
+        productQueryParams.setPrice(price);
+        productQueryParams.setOrderBy(orderBy);
+        productQueryParams.setSort(sort);
+        productQueryParams.setLimit(limit);
+        productQueryParams.setOffset(offset);
+
+        //先去拿products
+        List<Product> productList = productService.getProducts(productQueryParams);
+        Page<Product> page = new Page<>();
+
+        Long total = productService.countProduct(productQueryParams);
+
+        page.setLimit(limit);
+        page.setOffset(offset);
+        page.setTotal(total);
+        page.setResults(productList);
+
+        return ResponseEntity.status(HttpStatus.OK).body(page);
     }
 
 

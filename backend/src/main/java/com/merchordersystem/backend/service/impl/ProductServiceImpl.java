@@ -1,5 +1,7 @@
 package com.merchordersystem.backend.service.impl;
 
+import com.merchordersystem.backend.Specification.ProductSpecification;
+import com.merchordersystem.backend.dto.product.ProductQueryParams;
 import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.repository.ProductRepository;
@@ -7,7 +9,14 @@ import com.merchordersystem.backend.service.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ProductServiceImpl implements ProductService {
@@ -55,6 +64,31 @@ public class ProductServiceImpl implements ProductService {
             productRepository.save(product);
         }
     }
+
+    @Override
+    public List<Product> getProducts(ProductQueryParams productQueryParams) {
+
+        String orderBy = productQueryParams.getOrderBy();
+        String sort = productQueryParams.getSort();
+        Integer limit = productQueryParams.getLimit();
+        Integer offset = productQueryParams.getOffset();
+
+        Sort.Direction direction = sort.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by(direction, orderBy));
+        Specification<Product> spec = ProductSpecification.build(productQueryParams); // Filtering
+        Page<Product> springPage = productRepository.findAll(spec, pageable);
+
+        // 如果完全沒參數 → 全部使用者
+        return springPage.getContent();
+    }
+
+    @Override
+    public Long countProduct(ProductQueryParams productQueryParams) {
+        Specification<Product> spec = ProductSpecification.build(productQueryParams); // Filtering
+        return productRepository.count(spec);
+    }
+
+
 
 
 }
