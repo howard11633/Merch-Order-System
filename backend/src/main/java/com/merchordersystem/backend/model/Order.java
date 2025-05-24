@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "order")
+@Table(name = "orders")
 @Entity
 public class Order {
 
@@ -21,21 +21,23 @@ public class Order {
     @Column(name = "id")
     private Integer id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private String name;
+    private OrderStatus status;
 
     @Column(name = "total_price")
-    private double totalPrice;
+    private Double totalPrice;
 
     @Column(name ="order_date")
     private LocalDateTime orderDate;
-
-
 
     @PrePersist
     protected void onCreate() {
         this.orderDate = LocalDateTime.now();
     }
-
 
 }
