@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,6 +36,11 @@ public class Order {
 
     @Column(name ="order_date")
     private LocalDateTime orderDate;
+
+    //[擴充]
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<OrderItem> orderItemList;
 
     @PrePersist
     protected void onCreate() {

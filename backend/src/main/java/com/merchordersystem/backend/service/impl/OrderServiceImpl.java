@@ -67,6 +67,9 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setProduct(product);
             orderItem.setQuantity(buyItem.getQuantity());
 
+            orderItem.setProductName(product.getName());
+            orderItem.setImageUrl(product.getImageUrl());
+
             orderItemList.add(orderItem);
 
         }
@@ -78,5 +81,21 @@ public class OrderServiceImpl implements OrderService {
 
         return order.getId();
 
+    }
+
+    @Override
+    public Order getOrderById(Integer orderId) {
+
+        Order order = orderRepository.findById(orderId).orElse(null);
+
+        if (order == null) {
+            throw new RuntimeException("Order not found");  // 或自訂例外
+        }
+
+        List<OrderItem> orderItemList = orderItemRepository.findByOrderId(orderId);
+
+        order.setOrderItemList(orderItemList);
+
+        return order;
     }
 }

@@ -29,7 +29,7 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
-    //修改使用者資料
+    //修改產品資料
     @PutMapping("/products/{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
                                            @RequestBody @Valid ProductRequest productRequest){
@@ -44,20 +44,20 @@ public class ProductController {
         }
     }
 
-    //刪除使用者
+    //刪除產品
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<?> deleteProduct(@PathVariable Integer productId){
         productService.deleteProduct(productId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    //查詢單一使用者
+    //查詢單一產品
     @GetMapping("/products/{productId}")
     public Product getProduct(@PathVariable Integer productId){
         return productService.getProductById(productId);
     }
 
-    //查詢多個使用者
+    //查詢多個產品
     @GetMapping("/products")
     public ResponseEntity<Page<Product>> getProducts(
             @RequestParam(required = false) String search,

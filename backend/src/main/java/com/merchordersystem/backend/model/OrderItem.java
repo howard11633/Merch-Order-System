@@ -1,5 +1,6 @@
 package com.merchordersystem.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "orderItem")
+@Table(name = "order_item")
 @Entity
 public class OrderItem {
 
@@ -22,6 +23,7 @@ public class OrderItem {
     // 關聯到 Order 表
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
     // 關聯到 Product 表
@@ -34,5 +36,9 @@ public class OrderItem {
 
     @Column(name = "price", nullable = false)
     private Double price;
+
+    //[擴充] 讓使用者可以透過productId獲得product相關資訊
+    private String productName;
+    private String imageUrl;
 
 }
