@@ -12,8 +12,12 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,8 +60,19 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
 
         for (BuyItem buyItem : createOrderRequest.getBuyItemList()) {
+
+            //先找到該商品
             Product product = productRepository.findById(buyItem.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
+
+            //如果訂單商品數量少於庫存，無法建立訂單
+            if (product.getNumber() < buyItem.getQuantity()){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+
+            product.setNumber(product.getNumber() - buyItem.getQuantity());
+            productRepository.save(product);
+
             double price = product.getPrice() * buyItem.getQuantity();
             totalPrice += price;
 
