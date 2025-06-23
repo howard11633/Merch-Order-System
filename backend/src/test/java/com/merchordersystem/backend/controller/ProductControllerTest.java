@@ -5,9 +5,11 @@ import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.repository.ProductRepository;
 import com.merchordersystem.backend.service.ProductService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -15,6 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -38,10 +43,24 @@ public class ProductControllerTest {
     private ProductRepository productRepository;
 
     //測試用商品id
-    private Integer productId;
+    private List<Product> testProducts;
 
     // 建立測試商品用
     private Product createTestProduct(String name, Double price) {
+
+        Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        product.setNumber(10);
+        product.setDescription("就是" + name);
+        product.setImageUrl("test.com");
+        productRepository.save(product);
+
+        return product;
+    }
+
+    // 建立測試商品用
+    private Product createTestProductByRequest(String name, Double price) {
 
         ProductRequest request = new ProductRequest();
         request.setName(name);
@@ -56,14 +75,21 @@ public class ProductControllerTest {
 
     @BeforeEach
     public void setup(){
-        Product product = new Product();
-        product.setName("頭巾");
-        product.setPrice(300.0);
-        product.setNumber(10);
-        product.setDescription("套在頭上");
-        productRepository.save(product);
 
-        productId = product.getId();
+        productRepository.deleteAll(); // 清空資料庫表
+        testProducts = new ArrayList<>();
+
+        Product product1 = createTestProduct("商品A", 100.0);
+        Product product2 = createTestProduct("商品B", 200.0);
+        Product product3 = createTestProduct("商品C", 300.0);
+        Product product4 = createTestProduct("商品D", 400.0);
+        Product product5 = createTestProduct("商品E", 500.0);
+
+        testProducts.add(product1);
+        testProducts.add(product2);
+        testProducts.add(product3);
+        testProducts.add(product4);
+        testProducts.add(product5);
 
     }
 
@@ -120,7 +146,7 @@ public class ProductControllerTest {
     @Test
     public void updateProduct_success() throws Exception {
         //先建立商品
-        Product testProduct = createTestProduct("手套", 150.0);
+        Product testProduct = createTestProductByRequest("手套", 150.0);
         //再修改商品欄位（PUT就算只有修改部分欄位，也要一次覆蓋所有欄位）
         ProductRequest updateRequest = new ProductRequest();
         updateRequest.setName("新版手套");
@@ -150,7 +176,7 @@ public class ProductControllerTest {
     @Test
     public void updateProduct_illegalArgument() throws Exception {
         //先建立商品
-        Product testProduct = createTestProduct("手套", 150.0);
+        Product testProduct = createTestProductByRequest("手套", 150.0);
         //修改商品欄位，假設有少給欄位
         ProductRequest updateRequest = new ProductRequest();
         updateRequest.setName("新版手套");
@@ -193,6 +219,8 @@ public class ProductControllerTest {
     @Test
     public void deleteProduct_success() throws Exception {
 
+        Integer productId = testProducts.get(1).getId();
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/products/{productId}", productId);
 
@@ -213,12 +241,15 @@ public class ProductControllerTest {
 
     @Test
     public void getProduct_success() throws Exception {
+
+        Integer productId = testProducts.get(1).getId();
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/products/{productId}", productId);
         mockMvc.perform(requestBuilder)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", equalTo("頭巾")))
+                .andExpect(jsonPath("$.name", equalTo("商品B"))) //這寫死了
                 .andExpect(jsonPath("$.price", notNullValue()))
                 .andExpect(jsonPath("$.number", notNullValue()))
                 .andExpect(jsonPath("$.description", notNullValue()))
@@ -234,6 +265,56 @@ public class ProductControllerTest {
                 .andDo(print())
                 .andExpect(status().is(404));
     }
+
+    @Test
+    public void getProducts() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/products");
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.limit", notNullValue()))
+                .andExpect(jsonPath("$.offset", notNullValue()))
+                .andExpect(jsonPath("$.total", notNullValue()))
+                .andExpect(jsonPath("$.results", hasSize(5)));
+    }
+
+    @Test
+    public void getProducts_filtering() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/products")
+                .param("search", "商品B");
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.limit", notNullValue()))
+                .andExpect(jsonPath("$.offset", notNullValue()))
+                .andExpect(jsonPath("$.total", notNullValue()))
+                .andExpect(jsonPath("$.results", hasSize(1)));
+    }
+
+    @Test
+    public void getProducts_sorting() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/products")
+                .param("search", "商品")
+                .param("orderBy", "price")
+                .param("sort", "desc");
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.limit", notNullValue()))
+                .andExpect(jsonPath("$.offset", notNullValue()))
+                .andExpect(jsonPath("$.total", notNullValue()))
+                .andExpect(jsonPath("$.results", hasSize(5)))
+                .andExpect(jsonPath("$.results[0].price", equalTo(500.0)))
+                .andExpect(jsonPath("$.results[4].price", equalTo(100.0)));
+
+    }
+
+
 
 
 

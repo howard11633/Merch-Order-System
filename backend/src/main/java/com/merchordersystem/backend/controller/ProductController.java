@@ -70,7 +70,7 @@ public class ProductController {
             @RequestParam(required = false) Double price,
             @RequestParam(defaultValue = "price") String orderBy,
             @RequestParam(defaultValue = "asc") String sort,
-            @RequestParam(defaultValue = "4") Integer limit,
+            @RequestParam(defaultValue = "8") Integer limit,
             @RequestParam(defaultValue = "0") Integer offset){
 
         ProductQueryParams productQueryParams = new ProductQueryParams();
