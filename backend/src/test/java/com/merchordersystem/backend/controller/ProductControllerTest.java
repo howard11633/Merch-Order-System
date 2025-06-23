@@ -37,10 +37,12 @@ public class ProductControllerTest {
     @Autowired
     private ProductRepository productRepository;
 
+    //測試用商品id
     private Integer productId;
 
     // 建立測試商品用
     private Product createTestProduct(String name, Double price) {
+
         ProductRequest request = new ProductRequest();
         request.setName(name);
         request.setPrice(price);
@@ -163,6 +165,50 @@ public class ProductControllerTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
+    }
+
+    @Transactional
+    @Test
+    public void updateProduct_productNotFound() throws Exception {
+
+        ProductRequest updateRequest = new ProductRequest();
+        updateRequest.setName("新版手套");
+        updateRequest.setPrice(200.0);
+        updateRequest.setNumber(20);
+        updateRequest.setDescription("升級版手套");
+        updateRequest.setImageUrl("test.com");
+
+        String json = objectMapper.writeValueAsString(updateRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/products/{productId}", 2000)
+                .contentType(MediaType.APPLICATION_JSON) //告知發送的request中，content格式為何
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(404));
+    }
+
+    @Transactional
+    @Test
+    public void deleteProduct_success() throws Exception {
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete("/products/{productId}", productId);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(204));
+    }
+
+    @Transactional
+    @Test
+    public void deleteProduct_deleteNonExistingProduct() throws Exception {
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete("/products/{productId}", 2000);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(204));
     }
 
     @Test
