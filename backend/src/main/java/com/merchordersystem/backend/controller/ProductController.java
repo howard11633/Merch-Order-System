@@ -33,7 +33,8 @@ public class ProductController {
     @PutMapping("/products/{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
                                            @RequestBody @Valid ProductRequest productRequest){
-        Product product = getProduct(productId);
+
+        Product product = productService.getProductById(productId);
 
         if (product != null) {
             productService.updateProduct(productId, productRequest);
@@ -53,8 +54,13 @@ public class ProductController {
 
     //查詢單一產品
     @GetMapping("/products/{productId}")
-    public Product getProduct(@PathVariable Integer productId){
-        return productService.getProductById(productId);
+    public ResponseEntity<Product> getProduct(@PathVariable Integer productId){
+        Product product = productService.getProductById(productId);
+        if (product != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(product);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     //查詢多個產品
