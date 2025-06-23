@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.repository.ProductRepository;
+import com.merchordersystem.backend.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -32,9 +32,25 @@ public class ProductControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
+    private ProductService productService;
+
+    @Autowired
     private ProductRepository productRepository;
 
     private Integer productId;
+
+    // 建立測試商品用
+    private Product createTestProduct(String name, Double price) {
+        ProductRequest request = new ProductRequest();
+        request.setName(name);
+        request.setPrice(price);
+        request.setNumber(10);
+        request.setDescription("測試用商品");
+        request.setImageUrl("test.com");
+
+        Integer productId = productService.createProduct(request);
+        return productService.getProductById(productId);
+    }
 
     @BeforeEach
     public void setup(){
@@ -95,6 +111,57 @@ public class ProductControllerTest {
 
         mockMvc.perform(requestBuilder)
                 .andDo(print())
+                .andExpect(status().is(400));
+    }
+
+    @Transactional
+    @Test
+    public void updateProduct_success() throws Exception {
+        //先建立商品
+        Product testProduct = createTestProduct("手套", 150.0);
+        //再修改商品欄位（PUT就算只有修改部分欄位，也要一次覆蓋所有欄位）
+        ProductRequest updateRequest = new ProductRequest();
+        updateRequest.setName("新版手套");
+        updateRequest.setPrice(200.0);
+        updateRequest.setNumber(20);
+        updateRequest.setDescription("升級版手套");
+        updateRequest.setImageUrl("test.com");
+
+        String json = objectMapper.writeValueAsString(updateRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/products/{productId}", testProduct.getId())
+                .contentType(MediaType.APPLICATION_JSON) //告知發送的request中，content格式為何
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.name", equalTo("新版手套")))
+                .andExpect(jsonPath("$.price", equalTo(200.0)))
+                .andExpect(jsonPath("$.number", equalTo(20)))
+                .andExpect(jsonPath("$.description", equalTo("升級版手套")))
+                .andExpect(jsonPath("$.imageUrl", equalTo("test.com")));
+    }
+
+    @Transactional
+    @Test
+    public void updateProduct_illegalArgument() throws Exception {
+        //先建立商品
+        Product testProduct = createTestProduct("手套", 150.0);
+        //修改商品欄位，假設有少給欄位
+        ProductRequest updateRequest = new ProductRequest();
+        updateRequest.setName("新版手套");
+
+
+        String json = objectMapper.writeValueAsString(updateRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put("/products/{productId}", testProduct.getId())
+                .contentType(MediaType.APPLICATION_JSON) //告知發送的request中，content格式為何
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
     }
 
