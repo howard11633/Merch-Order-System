@@ -34,6 +34,8 @@ public class ProductServiceImpl implements ProductService {
         product.setPrice(productRequest.getPrice());
         product.setNumber(productRequest.getNumber());
         product.setDescription(productRequest.getDescription());
+        product.setImageUrl(productRequest.getImageUrl());
+
         // 存進 DB
         productRepository.save(product);
 

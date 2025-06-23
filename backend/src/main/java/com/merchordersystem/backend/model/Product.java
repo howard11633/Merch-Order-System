@@ -30,7 +30,7 @@ public class Product {
     private Double price;
 
     @Column(name = "number")
-    private Double number;
+    private Integer number;
 
     @Column(name = "description")
     private String description;

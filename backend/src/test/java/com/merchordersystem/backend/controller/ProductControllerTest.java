@@ -1,5 +1,7 @@
 package com.merchordersystem.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -25,6 +29,9 @@ public class ProductControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private ProductRepository productRepository;
 
     private Integer productId;
@@ -34,11 +41,61 @@ public class ProductControllerTest {
         Product product = new Product();
         product.setName("頭巾");
         product.setPrice(300.0);
-        product.setNumber(10.0);
+        product.setNumber(10);
         product.setDescription("套在頭上");
         productRepository.save(product);
+
         productId = product.getId();
-        System.out.println(product);
+
+    }
+
+    @Transactional
+    @Test
+    public void createProduct_success() throws Exception {
+        // 前端發起request，以request的形式送進後端
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("襪子");
+        productRequest.setPrice(50.0);
+        productRequest.setNumber(10);
+        productRequest.setDescription("套在腳上");
+        productRequest.setImageUrl("test.com");
+
+        //Java物件(productRequest) 轉 JSON格式
+        String json = objectMapper.writeValueAsString(productRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/products")
+                .contentType(MediaType.APPLICATION_JSON) //告知發送的request中，content格式為何
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", equalTo("襪子")))
+                .andExpect(jsonPath("$.price", equalTo(50.0)))
+                .andExpect(jsonPath("$.number", equalTo(10)))
+                .andExpect(jsonPath("$.description", equalTo("套在腳上")))
+                .andExpect(jsonPath("$.imageUrl", equalTo("test.com")));
+    }
+
+    @Transactional
+    @Test
+    public void createProduct_illegalArgument() throws Exception {
+        // 前端發起request，以request的形式送進後端
+        ProductRequest productRequest = new ProductRequest();
+        productRequest.setName("耳機");
+
+        //Java物件(productRequest) 轉 JSON格式
+        String json = objectMapper.writeValueAsString(productRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/products")
+                .contentType(MediaType.APPLICATION_JSON) //告知發送的request中，content格式為何
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().is(400));
     }
 
     @Test
@@ -64,5 +121,7 @@ public class ProductControllerTest {
                 .andDo(print())
                 .andExpect(status().is(404));
     }
+
+
 
 }

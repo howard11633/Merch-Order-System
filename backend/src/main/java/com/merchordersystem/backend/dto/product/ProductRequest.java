@@ -13,10 +13,10 @@ public class ProductRequest {
     private String name;
 
     @NotNull
-    private double price;
+    private Double price;
 
     @NotNull
-    private double number;
+    private Integer number;
 
     @NotNull
     private String description;
