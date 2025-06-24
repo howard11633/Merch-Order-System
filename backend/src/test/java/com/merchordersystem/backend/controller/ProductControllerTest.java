@@ -5,11 +5,9 @@ import com.merchordersystem.backend.dto.product.ProductRequest;
 import com.merchordersystem.backend.model.Product;
 import com.merchordersystem.backend.repository.ProductRepository;
 import com.merchordersystem.backend.service.ProductService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -311,11 +309,26 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.results", hasSize(5)))
                 .andExpect(jsonPath("$.results[0].price", equalTo(500.0)))
                 .andExpect(jsonPath("$.results[4].price", equalTo(100.0)));
-
     }
 
+    @Test
+    public void getProducts_pagination() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/products")
+                .param("orderBy", "price")
+                .param("sort", "desc")
+                .param("limit", "2")
+                .param("offset", "2");
 
-
-
+        mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.limit", notNullValue()))
+                .andExpect(jsonPath("$.offset", notNullValue()))
+                .andExpect(jsonPath("$.total", notNullValue()))
+                .andExpect(jsonPath("$.results", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].price", equalTo(300.0)))
+                .andExpect(jsonPath("$.results[1].price", equalTo(200.0)));
+    }
 
 }
