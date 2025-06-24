@@ -1,6 +1,7 @@
 package com.merchordersystem.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.merchordersystem.backend.dto.user.UserLoginRequest;
 import com.merchordersystem.backend.dto.user.UserRegisterRequest;
 import com.merchordersystem.backend.dto.user.UserRequest;
 import com.merchordersystem.backend.model.Gender;
@@ -45,7 +46,21 @@ class UserControllerTest {
 
     private List<User> testUsers;
 
-    // 建立測試使用者用
+    //測試登入時，先call api註冊一個新帳號
+    private void register (UserRegisterRequest userRegisterRequest) throws Exception {
+
+        String json = objectMapper.writeValueAsString(userRegisterRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(201));
+    }
+
+    // 建立測試使用者用(不是用Register)
     private User createTestUser(String email,
                                 String password,
                                 String name,
@@ -171,6 +186,98 @@ class UserControllerTest {
 
     }
 
+    @Test
+    public void login_success() throws Exception {
 
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test9@gmail.com");
+        userRegisterRequest.setPassword("test9");
+        userRegisterRequest.setName("Jas");
+        userRegisterRequest.setGender(Gender.FEMALE);
+
+        register(userRegisterRequest);
+
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail("test9@gmail.com");
+        userLoginRequest.setPassword("test9");
+
+        String json = objectMapper.writeValueAsString(userLoginRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andExpect(jsonPath("$.email", equalTo(userRegisterRequest.getEmail())))
+                .andExpect(jsonPath("$.createdAt", notNullValue()));
+
+    }
+
+    @Test
+    public void login_wrongPassword() throws Exception {
+
+        UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
+        userRegisterRequest.setEmail("test10@gmail.com");
+        userRegisterRequest.setPassword("test10");
+        userRegisterRequest.setName("Ken");
+        userRegisterRequest.setGender(Gender.MALE);
+
+        register(userRegisterRequest);
+
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail("test10@gmail.com");
+        userLoginRequest.setPassword("test9");
+
+        String json = objectMapper.writeValueAsString(userLoginRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(400));
+    }
+
+    @Test
+    public void login_invalidEmailFormat() throws Exception {
+
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail("test100.com");
+        userLoginRequest.setPassword("test100");
+
+        String json = objectMapper.writeValueAsString(userLoginRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(400));
+
+    }
+
+    @Test
+    public void login_emailNotExist() throws Exception {
+
+        UserLoginRequest userLoginRequest = new UserLoginRequest();
+        userLoginRequest.setEmail("test100@gmail.com");
+        userLoginRequest.setPassword("test100");
+
+        String json = objectMapper.writeValueAsString(userLoginRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().is(400));
+
+    }
 
 }
