@@ -23,9 +23,9 @@ public class Order {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    //從User改成user_id
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
